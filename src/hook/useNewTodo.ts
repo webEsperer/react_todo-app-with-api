@@ -19,7 +19,6 @@ export const useNewTodo = ({
   filteredTodos,
   error,
 }: Props) => {
-  const hasAllTodosCompleted = filteredTodos.every(todo => todo.completed);
   const [title, setTitle] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -85,6 +84,5 @@ export const useNewTodo = ({
     inputRef,
     handleTitle,
     handleNewTodo,
-    hasAllTodosCompleted,
   };
 };

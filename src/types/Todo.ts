@@ -7,6 +7,11 @@ export interface Todo {
 
 export type UpdateDataProps = {
   id: number;
-  completed: boolean;
-  title: string;
+} & Partial<Pick<Todo, 'title' | 'completed'>>;
+
+export type TitleType = {
+  event: React.FormEvent;
+  id: number;
+  setIsEditing: (value: boolean) => void;
+  newTitle: string;
 };

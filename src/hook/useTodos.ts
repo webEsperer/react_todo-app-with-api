@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FilterStatus } from '../types/FilterStatus';
-import { Todo } from '../types/Todo';
-import { deleteTodo, getTodos } from '../api/todos';
+import { TitleType, Todo, UpdateDataProps } from '../types/Todo';
+import { deleteTodo, getTodos, updateTodo } from '../api/todos';
 
 export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -10,11 +10,7 @@ export const useTodos = () => {
   );
   const [error, setError] = useState<string>('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
-  const [deleteTodosId, setDeleteTodosId] = useState<number[]>([]);
-
-  const activeTodos = useMemo(() => {
-    return todos.length > 0;
-  }, [todos.length]);
+  const [processingTodoIds, setProcessingTodoIds] = useState<number[]>([]);
 
   useEffect(() => {
     setError('');
@@ -22,6 +18,8 @@ export const useTodos = () => {
       .then(data => setTodos(data))
       .catch(() => setError('Unable to load todos'));
   }, []);
+
+  const activeTodos = useMemo(() => todos.length > 0, [todos.length]);
 
   const filteredTodos = useMemo(() => {
     switch (filterStatus) {
@@ -35,16 +33,103 @@ export const useTodos = () => {
   }, [todos, filterStatus]);
 
   const removeTodo = (id: number) => {
-    setDeleteTodosId(prev => [...prev, id]);
+    setProcessingTodoIds(prev => [...prev, id]);
 
     return deleteTodo(id)
       .then(() => {
         setTodos(prevTodos => prevTodos.filter(prevTodo => prevTodo.id !== id));
       })
       .catch(() => setError('Unable to delete a todo'))
+      .finally(() => {
+        setProcessingTodoIds(prev => prev.filter(prevTodo => prevTodo !== id));
+      });
+  };
+
+  const updatedTodos = (data: UpdateDataProps) => {
+    setProcessingTodoIds(prev => [...prev, data.id]);
+
+    return updateTodo(data)
+      .then(response =>
+        setTodos(prevTodos =>
+          prevTodos.map(todo => (todo.id === data.id ? response : todo)),
+        ),
+      )
+      .catch(() => setError('Unable to update a todo'))
       .finally(() =>
-        setDeleteTodosId(prev => prev.filter(prevTodo => prevTodo !== id)),
+        setProcessingTodoIds(prev =>
+          prev.filter(prevTodo => prevTodo !== data.id),
+        ),
       );
+  };
+
+  const handleRenameTitle = ({
+    event,
+    id,
+    setIsEditing,
+    newTitle,
+  }: TitleType) => {
+    event.preventDefault();
+    const findTodo = todos.find(todo => todo.id === id);
+
+    if (!findTodo) {
+      return;
+    }
+
+    const trimmedTitle = newTitle.trim();
+
+    if (findTodo.title === trimmedTitle) {
+      setIsEditing(false);
+
+      return;
+    }
+
+    if (trimmedTitle == '') {
+      removeTodo(findTodo.id);
+
+      return;
+    }
+
+    const updatedTitle = {
+      id: findTodo.id,
+      title: trimmedTitle,
+    };
+
+    setProcessingTodoIds(prev => [...prev, id]);
+
+    updateTodo(updatedTitle)
+      .then(response => {
+        setTodos(prevTodos =>
+          prevTodos.map(todo => (todo.id === findTodo.id ? response : todo)),
+        );
+        setIsEditing(false);
+      })
+      .catch(() => setError('Unable to update a todo'))
+      .finally(() =>
+        setProcessingTodoIds(prev => prev.filter(prevTodo => prevTodo !== id)),
+      );
+  };
+
+  const toggleCompleted = (todoItem?: Todo) => {
+    if (todoItem) {
+      const updateCompletedField = {
+        id: todoItem.id,
+        completed: !todoItem.completed,
+      };
+
+      updatedTodos(updateCompletedField);
+    } else {
+      const hasUncompleted = todos.some(todo => !todo.completed);
+
+      const uncompletedTodo = todos.filter(
+        todo => todo.completed === !hasUncompleted,
+      );
+      const updateCompletedFields = uncompletedTodo.map(todo => ({
+        id: todo.id,
+        completed: hasUncompleted,
+      }));
+
+      Promise.all(updateCompletedFields.map(todo => updatedTodos(todo)));
+    }
   };
 
   const deleteAllCompletedTodos = () => {
@@ -66,11 +151,13 @@ export const useTodos = () => {
     setError,
     tempTodo,
     setTempTodo,
-    deleteTodosId,
-    setDeleteTodosId,
+    processingTodoIds,
+    setProcessingTodoIds,
     filteredTodos,
     removeTodo,
     deleteAllCompletedTodos,
     activeTodos,
+    handleRenameTitle,
+    toggleCompleted,
   };
 };

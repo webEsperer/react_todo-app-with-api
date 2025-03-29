@@ -6,7 +6,7 @@ type Props = {
   filteredTodos: Todo[];
   error: string;
   setError: (value: string) => void;
-  toggleAll: () => void;
+  toggleCompleted: () => void;
   setTodos: (fn: SetTodosFuncion) => void;
   setTempTodo: (tempTask: Todo | null) => void;
   activeTodos: boolean;
@@ -20,17 +20,14 @@ export const Header: React.FC<Props> = ({
   setError,
   setTodos,
   setTempTodo,
-  toggleAll,
+  toggleCompleted,
   activeTodos,
 }) => {
-  const {
-    title,
-    isLoading,
-    inputRef,
-    handleTitle,
-    handleNewTodo,
-    hasAllTodosCompleted,
-  } = useNewTodo({ filteredTodos, error, setError, setTodos, setTempTodo });
+  const { title, isLoading, inputRef, handleTitle, handleNewTodo } = useNewTodo(
+    { filteredTodos, error, setError, setTodos, setTempTodo },
+  );
+
+  const hasAllTodosCompleted = filteredTodos.every(todo => todo.completed);
 
   return (
     <header className="todoapp__header">
@@ -41,7 +38,7 @@ export const Header: React.FC<Props> = ({
             active: hasAllTodosCompleted,
           })}
           data-cy="ToggleAllButton"
-          onClick={() => toggleAll()}
+          onClick={() => toggleCompleted()}
         />
       )}
 

@@ -1,34 +1,39 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import classNames from 'classnames';
-import { Todo } from '../../types/Todo';
+import { TitleType, Todo } from '../../types/Todo';
 import React, { useState } from 'react';
 
 type Props = {
   todo: Todo;
   removeTodo: (id: number) => void;
-  deleteTodosId?: number[];
-  toggleAll: (todo: Todo) => void | undefined;
-  handleRenameTitle: (
-    event: React.FormEvent,
-    id: number,
-    setIsEdditing: (value: boolean) => void,
-    newTitle: string,
-  ) => void;
+  isProcessing?: boolean;
+  toggleCompleted: (todo: Todo) => void | undefined;
+  handleRenameTitle: (params: TitleType) => void;
 };
 
 export const TodoItem = ({
   todo,
   removeTodo,
-  deleteTodosId,
-  toggleAll,
+  isProcessing,
+  toggleCompleted,
   handleRenameTitle,
 }: Props) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [newTitle, setNewTitle] = useState<string>(todo.title);
   const { title, completed, id } = todo;
 
-  const isDelete = deleteTodosId?.includes(id);
+  const handleTitleKeyEvents = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === 'Enter') {
+      handleRenameTitle({ event, id, setIsEditing, newTitle });
+    }
+
+    if (event.key === 'Escape') {
+      setIsEditing(false);
+    }
+  };
 
   return (
     <div data-cy="Todo" className={classNames('todo', { completed })}>
@@ -39,7 +44,7 @@ export const TodoItem = ({
           type="checkbox"
           className="todo__status"
           checked={completed}
-          onChange={() => toggleAll(todo)}
+          onChange={() => toggleCompleted(todo)}
         />
       </label>
       {isEditing ? (
@@ -51,18 +56,10 @@ export const TodoItem = ({
             placeholder="Empty todo will be deleted"
             value={newTitle}
             onChange={event => setNewTitle(event.target.value)}
-            onKeyDown={event => {
-              if (event.key === 'Enter') {
-                handleRenameTitle(event, id, setIsEditing, newTitle);
-              }
-
-              if (event.key === 'Escape') {
-                setIsEditing(false);
-              }
-            }}
+            onKeyDown={handleTitleKeyEvents}
             autoFocus
             onBlur={event => {
-              handleRenameTitle(event, id, setIsEditing, newTitle);
+              handleRenameTitle({ event, id, setIsEditing, newTitle });
             }}
           />
         </form>
@@ -89,7 +86,7 @@ export const TodoItem = ({
       <div
         data-cy="TodoLoader"
         className={classNames('modal overlay', {
-          'is-active': (todo && !id) || isDelete,
+          'is-active': (todo && !id) || isProcessing,
         })}
       >
         <div className="modal-background has-background-white-ter" />
