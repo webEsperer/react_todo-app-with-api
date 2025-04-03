@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { useEffect } from 'react';
-import { useTodosContext } from '../../hook/TodosContext';
+import { useTodosContext } from '../../hook/useTodosContext';
 
 export const ErrorNotification = () => {
   const { error, dispatch } = useTodosContext();
@@ -32,42 +32,3 @@ export const ErrorNotification = () => {
     </div>
   );
 };
-
-//
-
-// import classNames from 'classnames';
-// import { useEffect } from 'react';
-
-// type Props = {
-//   error: string;
-//   setError: (value: string) => void;
-// };
-
-// export const ErrorNotification: React.FC<Props> = ({ error, setError }) => {
-//   useEffect(() => {
-//     if (!error) {
-//       return;
-//     }
-
-//     const timeError = setTimeout(() => {
-//       setError('');
-//     }, 3000);
-
-//     return () => {
-//       clearTimeout(timeError);
-//     };
-//   }, [error, setError]);
-
-//   return (
-//     <div
-//       data-cy="ErrorNotification"
-//       className={classNames(
-//         'notification is-danger is-light has-text-weight-normal',
-//         { hidden: !error },
-//       )}
-//     >
-//       <button data-cy="HideErrorButton" type="button" className="delete" />
-//       {error}
-//     </div>
-//   );
-// };
