@@ -4,10 +4,6 @@ import { TodoItem } from '../TodoItems';
 export const TodoList = () => {
   const { todos, filteredTodos, tempTodo } = useTodosContext();
 
-  if (!todos?.length) {
-    return null;
-  }
-
   return (
     todos?.length > 0 && (
       <section className="todoapp__main" data-cy="TodoList">

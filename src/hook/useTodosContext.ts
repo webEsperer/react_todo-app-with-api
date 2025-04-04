@@ -5,7 +5,7 @@ export const useTodosContext = () => {
   const context = useContext(TodosContext);
 
   if (!context) {
-    throw new Error('useTodosContext must be used with TodoProvider');
+    throw new Error('Context Does not exist');
   }
 
   return context;

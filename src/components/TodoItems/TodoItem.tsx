@@ -2,7 +2,7 @@
 
 import classNames from 'classnames';
 import { Todo } from '../../types/Todo';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTodosContext } from '../../hook/useTodosContext';
 
 type Props = {
@@ -12,22 +12,16 @@ type Props = {
 export const TodoItem = ({ todo }: Props) => {
   const [newTitle, setNewTitle] = useState<string>(todo.title);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const { handleRenameTitle, toggleCompleted, removeTodo, processingTodoIds } =
-    useTodosContext();
+
+  const {
+    handleRenameTitle,
+    toggleCompleted,
+    removeTodo,
+    processingTodoIds,
+    handleTitleKeyEvents,
+  } = useTodosContext();
 
   const { title, completed, id } = todo;
-
-  const handleTitleKeyEvents = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === 'Enter') {
-      handleRenameTitle({ event, id, newTitle, setIsEditing });
-    }
-
-    if (event.key === 'Escape') {
-      setIsEditing(false);
-    }
-  };
 
   const isProcessing = processingTodoIds?.includes(todo.id);
 
@@ -52,7 +46,9 @@ export const TodoItem = ({ todo }: Props) => {
             placeholder="Empty todo will be deleted"
             value={newTitle}
             onChange={event => setNewTitle(event.target.value)}
-            onKeyDown={handleTitleKeyEvents}
+            onKeyDown={event =>
+              handleTitleKeyEvents(event, id, newTitle, setIsEditing)
+            }
             autoFocus
             onBlur={event => {
               handleRenameTitle({ event, id, newTitle, setIsEditing });

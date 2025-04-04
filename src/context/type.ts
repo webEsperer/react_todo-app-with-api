@@ -1,7 +1,14 @@
 import { Dispatch } from 'react';
-import { TodosAction } from '../reducer/type';
 import { FilterStatus } from '../types/FilterStatus';
 import { TitleType, Todo } from '../types/Todo';
+import { TodosAction } from '../state/type';
+
+export type Test = (
+  event: React.KeyboardEvent<HTMLInputElement>,
+  id: number,
+  newTitle: string,
+  setIsEditing: (value: boolean) => void,
+) => void;
 
 export type TodosContextType = {
   todos: Todo[];
@@ -19,5 +26,6 @@ export type TodosContextType = {
   isLoading: boolean;
   tempTodo: Todo | null;
   filterTodosStatus: FilterStatus;
+  handleTitleKeyEvents: Test;
   dispatch: Dispatch<TodosAction>;
 };

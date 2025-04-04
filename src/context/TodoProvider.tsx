@@ -11,6 +11,7 @@ import {
 import { UserWarning } from '../UserWarning';
 import { TodosContext } from './TodosContext';
 import { initialState, reducer } from '../state/todoReducer';
+import { Test } from './type';
 
 export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -173,6 +174,16 @@ export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
       );
   };
 
+  const handleTitleKeyEvents: Test = (event, id, newTitle, setIsEditing) => {
+    if (event.key === 'Enter') {
+      handleRenameTitle({ event, id, newTitle, setIsEditing });
+    }
+
+    if (event.key === 'Escape') {
+      setIsEditing(false);
+    }
+  };
+
   const toggleCompleted = (todoItem?: Todo) => {
     if (todoItem) {
       const updateCompletedField = {
@@ -224,6 +235,7 @@ export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading: state.isLoading,
         tempTodo: state.tempTodo,
         filterTodosStatus: state.filterTodosStatus,
+        handleTitleKeyEvents,
         dispatch,
       }}
     >
