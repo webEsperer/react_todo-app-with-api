@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
+import { useState } from 'react';
 import classNames from 'classnames';
 import { Todo } from '../../types/Todo';
-import { useState } from 'react';
 import { useTodosContext } from '../../hook/useTodosContext';
 
 type Props = {

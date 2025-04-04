@@ -3,7 +3,7 @@ import { FilterStatus } from '../types/FilterStatus';
 import { TitleType, Todo } from '../types/Todo';
 import { TodosAction } from '../state/type';
 
-export type Test = (
+export type KeyEventsParams = (
   event: React.KeyboardEvent<HTMLInputElement>,
   id: number,
   newTitle: string,
@@ -26,6 +26,6 @@ export type TodosContextType = {
   isLoading: boolean;
   tempTodo: Todo | null;
   filterTodosStatus: FilterStatus;
-  handleTitleKeyEvents: Test;
+  handleTitleKeyEvents: KeyEventsParams;
   dispatch: Dispatch<TodosAction>;
 };

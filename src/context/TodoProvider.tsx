@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { FilterStatus } from '../types/FilterStatus';
 import { TitleType, Todo, UpdateDataProps } from '../types/Todo';
+import { KeyEventsParams } from './type';
 import {
   addTodo,
   deleteTodo,
@@ -8,10 +9,9 @@ import {
   updateTodo,
   USER_ID,
 } from '../api/todos';
-import { UserWarning } from '../UserWarning';
 import { TodosContext } from './TodosContext';
 import { initialState, reducer } from '../state/todoReducer';
-import { Test } from './type';
+import { UserWarning } from '../UserWarning';
 
 export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -174,7 +174,12 @@ export const TodosProvider: React.FC<{ children: React.ReactNode }> = ({
       );
   };
 
-  const handleTitleKeyEvents: Test = (event, id, newTitle, setIsEditing) => {
+  const handleTitleKeyEvents: KeyEventsParams = (
+    event,
+    id,
+    newTitle,
+    setIsEditing,
+  ) => {
     if (event.key === 'Enter') {
       handleRenameTitle({ event, id, newTitle, setIsEditing });
     }
